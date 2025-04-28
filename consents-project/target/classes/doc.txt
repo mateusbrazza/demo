@@ -1,0 +1,112 @@
+🔥 Fluxo completo do endpoint POST /consents
+Usuário → envia uma requisição POST com headers + body.
+
+👇 A aplicação faz:
+
+Recebe a requisição no ConsentController#createConsent.
+
+Validação de headers obrigatórios:
+
+Authorization obrigatório (se faltar → 401 Unauthorized).
+
+x-idempotency-key obrigatório (se faltar → 400 Bad Request).
+
+x-fapi-interaction-id obrigatório (se faltar → 400 Bad Request).
+
+Validação do body da requisição:
+
+Campo data não pode ser nulo.
+
+Dentro de data, o loggedUser e permissions devem estar corretos.
+
+Dentro de loggedUser, o document (com identification e rel) deve existir e ser válido.
+
+Permissões:
+
+Não pode misturar Fase 2 e Fase 3.
+
+Se for Fase 2:
+
+Não pode mandar apenas RESOURCES_READ sozinho.
+
+É obrigatório mandar RESOURCES_READ junto com outras permissões válidas da fase 2.
+
+Se for Fase 3:
+
+Todas as permissões precisam pertencer ao mesmo grupo.
+
+Se for grupo com duas permissões obrigatórias (ex: QUOTE_AUTO_LEAD_CREATE e QUOTE_AUTO_LEAD_UPDATE), deve mandar as duas.
+
+Idempotência:
+
+Verifica se já existe um consentimento com o mesmo x-idempotency-key no cache.
+
+Se existir:
+
+Se a requisição for idêntica, retorna o consentimento já criado (200 OK).
+
+Se for diferente, lança erro 422 Unprocessable Entity (mudou o conteúdo).
+
+Geração do consentimento:
+
+Gera o consentId no formato urn:seuprojeto:{UUID}.
+
+Define creationDateTime e statusUpdateDateTime como agora (UTC).
+
+Define status como AWAITING_AUTHORISATION.
+
+Armazena o consentimento no cache.
+
+Resposta:
+
+HTTP 201 Created.
+
+Body no formato definido no YAML (data, links, meta).
+
+🚀 Fluxo completo do endpoint GET /consents/{consentId}
+Usuário → envia uma requisição GET com headers.
+
+👇 A aplicação faz:
+
+Recebe a requisição no ConsentController#getConsent.
+
+Validação de headers obrigatórios:
+
+Authorization obrigatório (se faltar → 401 Unauthorized).
+
+x-fapi-interaction-id obrigatório (se faltar → 400 Bad Request).
+
+Busca no cache pelo consentId.
+
+Se encontrar:
+
+Retorna o consentimento (200 OK).
+
+Se não encontrar:
+
+Lança 404 Not Found.
+
+🧹 Fluxo completo do endpoint DELETE /consents/{consentId}
+Usuário → envia uma requisição DELETE com headers.
+
+👇 A aplicação faz:
+
+Recebe a requisição no ConsentController#deleteConsent.
+
+Validação de headers obrigatórios:
+
+Authorization obrigatório (se faltar → 401 Unauthorized).
+
+x-fapi-interaction-id obrigatório (se faltar → 400 Bad Request).
+
+Busca no cache pelo consentId.
+
+Se encontrar:
+
+Remove o consentimento do cache.
+
+Retorna 204 No Content.
+
+Se não encontrar:
+
+Lança 404 Not Found.

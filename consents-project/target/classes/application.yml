@@ -1,0 +1,13 @@
+server:
+  port: 4747
+
+spring:
+  cache:
+    type: simple
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
