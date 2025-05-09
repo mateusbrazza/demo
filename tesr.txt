@@ -34,3 +34,27 @@ protected void validateNoMixPFandPJ(OpinExternalRequestV2 req) {
         }
     }
 }
+
+
+
+protected void validateFunctionalGroupRules(List<String> permissions) {
+    Set<String> set = new HashSet<>(permissions);
+
+    if (set.stream().anyMatch(p -> p.contains("CREDIT"))) {
+        if (!PermissionCatalog.hasAllPermissionsOfGroup(set, "CREDIT")) {
+            throw new PermissionsValidationException("Permissão obrigatória do grupo de crédito ausente.");
+        }
+    }
+
+    if (set.stream().anyMatch(p -> p.contains("INVESTMENTS"))) {
+        if (!PermissionCatalog.hasAllPermissionsOfGroup(set, "INVESTMENTS")) {
+            throw new PermissionsValidationException("Permissão obrigatória do grupo de investimentos ausente.");
+        }
+    }
+
+    if (set.stream().anyMatch(p -> p.contains("EXCHANGES"))) {
+        if (!PermissionCatalog.hasAllPermissionsOfGroup(set, "EXCHANGES")) {
+            throw new PermissionsValidationException("Permissão obrigatória do grupo de câmbio ausente.");
+        }
+    }
+}
