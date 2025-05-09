@@ -143,3 +143,18 @@ public class PermissionCatalog {
             && permissions.stream().anyMatch(PermissionCatalog::isFase3Permission);
     }
 }
+
+
+    // ------------------- Grupos obrigatórios da Fase 2 -------------------
+    public static final Map<String, Set<String>> FASE2_REQUIRED_GROUPS = Map.of(
+        "CREDIT", Set.of("CREDIT_OPERATIONS_READ"),
+        "INVESTMENTS", Set.of("INVESTMENTS_READ"),
+        "EXCHANGES", Set.of("EXCHANGES_READ")
+    );
+
+    public static boolean hasAllPermissionsOfGroup(Set<String> permissions, String groupKey) {
+        Set<String> required = FASE2_REQUIRED_GROUPS.get(groupKey);
+        return required == null || permissions.containsAll(required);
+    }
+
+}
