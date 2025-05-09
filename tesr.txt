@@ -1,0 +1,36 @@
+    public static boolean isPessoaFisica(String rel) {
+        return "CPF".equalsIgnoreCase(rel);
+    }
+
+    public static boolean isPessoaJuridica(String rel) {
+        return "CNPJ".equalsIgnoreCase(rel);
+    }
+
+    public static boolean isPermissaoDePessoaJuridica(String permission) {
+        return permission.contains("BUSINESS");
+    }
+
+    public static boolean isPermissaoDePessoaFisica(String permission) {
+        return permission.contains("PERSONAL");
+    }
+
+protected void validateNoMixPFandPJ(OpinExternalRequestV2 req) {
+    String rel = Optional.ofNullable(req.getData())
+        .map(OpinExternalRequestV2.Data::getLoggedUser)
+        .map(OpinExternalRequestV2.Data.LoggedUser::getDocument)
+        .map(OpinExternalRequestV2.Data.LoggedUser.Document::getRel)
+        .orElse("");
+
+    if (!ConsentUtils.isPessoaFisica(rel) && !ConsentUtils.isPessoaJuridica(rel)) {
+        throw new PermissionsValidationException("Tipo de usuário inválido (rel deve ser CPF ou CNPJ).");
+    }
+
+    for (String permission : req.getData().getPermissions()) {
+        if (ConsentUtils.isPessoaFisica(rel) && ConsentUtils.isPermissaoDePessoaJuridica(permission)) {
+            throw new PermissionsValidationException("Pessoa física não pode usar permissões de pessoa jurídica (BUSINESS).");
+        }
+        if (ConsentUtils.isPessoaJuridica(rel) && ConsentUtils.isPermissaoDePessoaFisica(permission)) {
+            throw new PermissionsValidationException("Pessoa jurídica não pode usar permissões de pessoa física (PERSONAL).");
+        }
+    }
+}
