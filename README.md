@@ -1,169 +1,135 @@
-public class br.com.seuprojeto.consents.rules.v2.PermissionCatalog {
+✅ POST /consents – Criação de consentimento
+🔵 FASE 2
+🌐 Sucesso
+ RESOURCES_READ + permissão de pessoa física (ex: CUSTOMERS_PERSONAL_IDENTIFICATIONS_READ)
 
-    // Permissões de compartilhamento de dados (Fase 2)
-    public static final Set<String> DATA_SHARING_PERMISSIONS = Set.of(
-        "CUSTOMERS_PERSONAL_IDENTIFICATIONS_READ",
-        "CUSTOMERS_BUSINESS_IDENTIFICATIONS_READ",
-        "CAPITALIZATION_TITLE_READ",
-        "PENSION_PLAN_READ",
-        "LIFE_PENSION_READ",
-        "FINANCIAL_ASSISTANCE_READ",
-        "DAMAGES_AND_PEOPLE_AUTO_READ",
-        "RESOURCES_READ"
-        // Adicione todas as outras permissões de Fase 2 conforme necessário
-    );
+ RESOURCES_READ + permissão de pessoa jurídica com businessEntity (ex: CUSTOMERS_BUSINESS_IDENTIFICATIONS_READ)
 
-    // Permissões de iniciação de serviços (Fase 3)
-    public static final Map<String, String> SERVICE_INITIATION_GROUPS = Map.ofEntries(
-        Map.entry("CLAIM_NOTIFICATION_REQUEST_DAMAGE_CREATE", "SINISTRO"),
-        Map.entry("CLAIM_NOTIFICATION_REQUEST_PERSON_CREATE", "SINISTRO"),
-        Map.entry("ENDORSEMENT_REQUEST_CREATE", "ENDOSSO"),
-        Map.entry("QUOTE_AUTO_LEAD_CREATE", "COTACAO_AUTO"),
-        Map.entry("QUOTE_HOUSING_LEAD_CREATE", "COTACAO_HABITACIONAL")
-        // Adicione todos os mapeamentos conforme a documentação
-    );
+ Permissões múltiplas da mesma categoria (ex: CUSTOMERS_PERSONAL_IDENTIFICATIONS_READ, CUSTOMERS_PERSONAL_ADDITIONALINFO_READ)
 
-    public static final Set<String> SERVICE_INITIATION_PERMISSIONS = SERVICE_INITIATION_GROUPS.keySet();
+ Permissões parcialmente suportadas → 201 com subconjunto aceito
 
-    public static final List<String> ACCOUNT_BASE = List.of("ACCOUNTS_READ");
-    public static final List<String> ACCOUNTS = List.of("ACCOUNTS_TRANSACTIONS_READ");
-    public static final List<String> CREDIT_CARD_BASE = List.of("CREDIT_CARDS_READ");
-    public static final List<String> CREDIT_CARD_BILLS = List.of("CREDIT_CARDS_BILLS_READ");
-    public static final Set<String> PF = Set.of("CUSTOMERS_PERSONAL_IDENTIFICATIONS_READ", "ACCOUNTS_READ");
-    public static final Set<String> PJ = Set.of("CUSTOMERS_BUSINESS_IDENTIFICATIONS_READ");
-    public static final List<String> CREDIT_REQUIRED = List.of("CREDIT_OPERATIONS_READ");
-    public static final List<String> INVESTMENTS_REQUIRED = List.of("INVESTMENTS_READ");
-    public static final List<String> EXCHANGES_REQUIRED = List.of("EXCHANGES_READ");
-}
+❌ Falhas
+ Apenas RESOURCES_READ → 400
 
-public class br.com.seuprojeto.consents.rules.v2.PermissionsValidationV2 {
+ Permissão de PJ sem businessEntity → 400 ou 422
 
-    protected void validateEmptyPermissions(ConsentRequestV2 req) {
-        if (req.getData().getPermissions() == null || req.getData().getPermissions().isEmpty()) {
-            throw new PermissionsValidationException("A lista de permissões está vazia.");
-        }
-    }
+ Mistura Fase 2 + Fase 3 → 422
 
-    protected void validatePermissionFormat(List<String> permissions) {
-        boolean hasInvalid = permissions.stream()
-            .anyMatch(p -> !p.equals(p.trim()) || !p.equals(p.toUpperCase()));
-        if (hasInvalid) {
-            throw new PermissionsValidationException("Permissões devem estar em letras maiúsculas e sem espaços.");
-        }
-    }
+ Pessoa jurídica com CPF → 422
 
-    protected void validateMinimumPermissionCount(List<String> permissions) {
-        if (permissions.size() < 1) {
-            throw new PermissionsValidationException("Deve haver pelo menos uma permissão.");
-        }
-    }
+ Permissão de PJ sem RESOURCES_READ → 400
 
-    protected void validateOnlyValidPermissions(List<String> permissions) {
-        Set<String> validPermissions = new HashSet<>();
-        validPermissions.addAll(br.com.seuprojeto.consents.rules.v2.PermissionCatalog.DATA_SHARING_PERMISSIONS);
-        validPermissions.addAll(br.com.seuprojeto.consents.rules.v2.PermissionCatalog.SERVICE_INITIATION_PERMISSIONS);
+ Permissões de PF com businessEntity → 422
 
-        permissions.stream()
-            .filter(p -> !validPermissions.contains(p))
-            .findAny()
-            .ifPresent(invalid -> {
-                throw new PermissionsValidationException("Permissão inválida: " + invalid);
-            });
-    }
+ loggedUser ausente ou rel ≠ CPF → 400
 
-    protected void validateHasRequiredGroupPermissions(List<String> permissions, List<String> requiredGroup) {
-        if (!permissions.containsAll(requiredGroup)) {
-            throw new PermissionsValidationException("Está faltando permissão obrigatória do grupo: " + requiredGroup);
-        }
-    }
+ expirationDateTime mal formatado → 400
 
-    protected void validateGroupBaseRule(List<String> permissions, List<String> base, List<String> dependents) {
-        boolean hasDependent = permissions.stream().anyMatch(dependents::contains);
-        boolean hasBase = permissions.stream().anyMatch(base::contains);
+🟣 FASE 3
+🌐 Sucesso
+ Agrupamento completo de uma permissão Fase 3 (ex: ENDORSEMENT_REQUEST_CREATE com endorsementInformation)
 
-        if (hasDependent && !hasBase) {
-            throw new PermissionsValidationException("Permissão base ausente para permissões dependentes.");
-        }
-    }
+ Permissões parcialmente suportadas → 201 com subset funcional
 
-    protected void validateNoMixPFandPJ(List<String> permissions) {
-        boolean hasPF = permissions.stream().anyMatch(br.com.seuprojeto.consents.rules.v2.PermissionCatalog.PF::contains);
-        boolean hasPJ = permissions.stream().anyMatch(br.com.seuprojeto.consents.rules.v2.PermissionCatalog.PJ::contains);
-        if (hasPF && hasPJ) {
-            throw new PermissionsValidationException("Não é permitido misturar permissões de PF e PJ.");
-        }
-    }
-}
+ Consentimento de resgate com objeto obrigatório (withdrawalLifePensionInformation, etc.)
 
-public class br.com.seuprojeto.consents.rules.v2.RulesOpinV2 extends br.com.seuprojeto.consents.rules.v2.PermissionsValidationV2 {
+❌ Falhas
+ Agrupamentos múltiplos de Fase 3 → 422
 
-    public void validateConsent(ConsentRequestV2 req, String brandCode) {
-        validateBrandActive(brandCode, req.getData().getBusinessType());
-        validateEmptyPermissions(req);
+ Permissões de Fase 3 sem permissão obrigatória do agrupamento → 400
 
-        List<String> permissions = req.getData().getPermissions();
-        validatePermissionFormat(permissions);
-        validateOnlyValidPermissions(permissions);
-        validateMinimumPermissionCount(permissions);
-        validateNoMixPFandPJ(permissions);
-        validateFunctionalGroupRules(permissions);
-        validateBaseDependencyRules(permissions);
-        validateExpirationDate(req.getData().getExpirationDateTime());
+ Permissão Fase 3 sem seu objeto obrigatório → 422
 
-        validateNoMixedPhases(permissions);
-        validateSinglePhase3Group(permissions);
-    }
+ Consentimento Fase 3 para si mesmo (SPOC) → 422
 
-    protected void validateBrandActive(String brandCode, BusinessType businessType) {
-        BrandEnum brand = BrandEnum.getByBrandCode(brandCode);
-        if (brand == null || !brand.isActiveFor(businessType)) {
-            throw new BrandValidationException("Marca inativa ou inválida para o tipo: " + businessType);
-        }
-    }
+ Permissões de Fase 3 com agrupamento incompleto (ex: só QUOTE_AUTO_LEAD_UPDATE) → 400
 
-    protected void validateExpirationDate(String expirationDateTime) {
-        if (expirationDateTime == null || expirationDateTime.isBlank()) {
-            throw new DateTimeValidationException("Data de expiração não informada.");
-        }
+ withdrawalReasonOthers ausente com withdrawalReason = OUTROS → 400
 
-        LocalDateTime expiration = LocalDateTime.parse(expirationDateTime);
-        if (expiration.isBefore(LocalDateTime.now())) {
-            throw new DateTimeValidationException("Data de expiração está no passado.");
-        }
+ desiredTotalAmount ausente com withdrawalType = 2_PARCIAL → 400
 
-        if (expiration.isAfter(LocalDateTime.now().plusYears(1))) {
-            throw new DateTimeValidationException("Data de expiração excede o limite de 1 ano.");
-        }
-    }
+🟢 COMUM A AMBAS
+❌ Falhas
+ Falta de campo obrigatório (expirationDateTime, permissions, loggedUser) → 400
 
-    protected void validateFunctionalGroupRules(List<String> permissions) {
-        validateHasRequiredGroupPermissions(permissions, br.com.seuprojeto.consents.rules.v2.PermissionCatalog.CREDIT_REQUIRED);
-        validateHasRequiredGroupPermissions(permissions, br.com.seuprojeto.consents.rules.v2.PermissionCatalog.INVESTMENTS_REQUIRED);
-        validateHasRequiredGroupPermissions(permissions, br.com.seuprojeto.consents.rules.v2.PermissionCatalog.EXCHANGES_REQUIRED);
-    }
+ Permissões inexistentes → 400
 
-    protected void validateBaseDependencyRules(List<String> permissions) {
-        validateGroupBaseRule(permissions, br.com.seuprojeto.consents.rules.v2.PermissionCatalog.ACCOUNT_BASE, br.com.seuprojeto.consents.rules.v2.PermissionCatalog.ACCOUNTS);
-        validateGroupBaseRule(permissions, br.com.seuprojeto.consents.rules.v2.PermissionCatalog.CREDIT_CARD_BASE, br.com.seuprojeto.consents.rules.v2.PermissionCatalog.CREDIT_CARD_BILLS);
-    }
+ businessEntity ausente quando exigido → 400 ou 422
 
-    private void validateNoMixedPhases(List<String> permissions) {
-        boolean hasPhase2 = permissions.stream().anyMatch(br.com.seuprojeto.consents.rules.v2.PermissionCatalog.DATA_SHARING_PERMISSIONS::contains);
-        boolean hasPhase3 = permissions.stream().anyMatch(br.com.seuprojeto.consents.rules.v2.PermissionCatalog.SERVICE_INITIATION_PERMISSIONS::contains);
+ Idempotency com divergência de payload → 422
 
-        if (hasPhase2 && hasPhase3) {
-            throw new PermissionsValidationException("Não é permitido misturar permissões de Fase 2 com Fase 3.");
-        }
-    }
+✅ GET /consents/{consentId} – Consulta de consentimento
+🌐 Sucesso
+ Consulta de status AWAITING_AUTHORISATION
 
-    private void validateSinglePhase3Group(List<String> permissions) {
-        Set<String> groups = permissions.stream()
-            .filter(br.com.seuprojeto.consents.rules.v2.PermissionCatalog.SERVICE_INITIATION_PERMISSIONS::contains)
-            .map(p -> br.com.seuprojeto.consents.rules.v2.PermissionCatalog.SERVICE_INITIATION_GROUPS.get(p))
-            .collect(Collectors.toSet());
+ Consulta de status AUTHORISED, CONSUMED, REJECTED, REVOKED
 
-        if (groups.size() > 1) {
-            throw new PermissionsValidationException("Só é permitido enviar permissões de um único agrupamento da Fase 3.");
-        }
-    }
-}
+ Consentimento expirado → status REJECTED, motivo CONSENT_EXPIRED
+
+ Consentimento revogado → status REVOKED, motivo CONSENT_MAX_DATE_REACHED
+
+❌ Falhas
+ Consentimento inexistente → 404
+
+ Token ausente ou inválido → 401 ou 403
+
+ Consulta após expiração → status REJECTED com motivo
+
+ Consulta após revogação → status REVOKED com motivo
+
+ Campo rejection ausente em status REJECTED ou REVOKED → inválido
+
+ Permissões não suportadas → não devem aparecer na resposta
+
+✅ DELETE /consents/{consentId} – Revogação de consentimento
+🌐 Sucesso
+ Consentimento AUTHORISED → status REVOKED
+
+ Consentimento AWAITING_AUTHORISATION → status REJECTED, motivo CUSTOMER_MANUALLY_REJECTED
+
+❌ Falhas
+ Consentimento REVOKED, REJECTED, CONSUMED → 422
+
+ Consentimento inexistente → 404
+
+ Token inválido ou ausente → 401 ou 403
+
+ Revogação de consentimento expirado → status já é REJECTED, não permite DELETE
+
+ Header x-fapi-interaction-id ausente → 400
+
+✅ Extras para todos os métodos
+ Headers obrigatórios presentes (Authorization, x-fapi-interaction-id, x-v, x-min-v, etc.)
+
+ Campos de resposta: data, links, meta presentes e válidos
+
+ Datas em formato RFC3339 + Z (UTC)
+
+💡 Agora sim, com essa divisão por método e fase, você tem um mapeamento completo e auditável com todos os casos que a SUSEP exige ou implica.
+Q1: Quais campos da resposta devem ser validados em cada status (AWAITING_AUTHORISATION, REJECTED, REVOKED)?
+→ Para cada status, os campos obrigatórios mudam:
+
+REJECTED e REVOKED devem conter rejection com rejectedBy e reason.code.
+
+AWAITING_AUTHORISATION não deve ter rejection.
+
+Campos como permissions, creationDateTime, status, expirationDateTime são sempre obrigatórios.
+
+Q2: O que acontece se eu enviar permissões duplicadas no POST? A SUSEP trata isso?
+→ Não há menção direta na documentação, mas a prática correta é:
+
+Remover duplicatas no backend.
+
+Responder apenas com o conjunto distinto de permissões.
+
+Ideal incluir um teste que envia permissões duplicadas e validar se a resposta é normalizada.
+
+Q3: É permitido atualizar um consentimento após criado? Existe PATCH/PUT?
+→ Não. A SUSEP não define nenhum endpoint de atualização de consentimento.
+
+Consentimentos são imutáveis após criados.
+
+Qualquer mudança requer revogação e criação de novo consentimento.
+
+Tentar implementar PATCH ou PUT seria fora do escopo da regulação e deve ser evitado.

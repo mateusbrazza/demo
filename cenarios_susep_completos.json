@@ -1,0 +1,792 @@
+[
+  {
+    "categoria":"FASE 2 - Sucesso",
+    "descricao":"PF com RESOURCES_READ + PERSONAL",
+    "entrada":{
+      "permissions":[
+        "RESOURCES_READ",
+        "CUSTOMERS_PERSONAL_IDENTIFICATIONS_READ"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"12345678900",
+          "rel":"CPF"
+        }
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":201,
+      "statusConsent":"AWAITING_AUTHORISATION",
+      "permissions":[
+        "RESOURCES_READ",
+        "CUSTOMERS_PERSONAL_IDENTIFICATIONS_READ"
+      ]
+    }
+  },
+  {
+    "categoria":"FASE 2 - Sucesso",
+    "descricao":"PJ com RESOURCES_READ + BUSINESS",
+    "entrada":{
+      "permissions":[
+        "RESOURCES_READ",
+        "CUSTOMERS_BUSINESS_IDENTIFICATIONS_READ"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"12345678000199",
+          "rel":"CNPJ"
+        }
+      },
+      "businessEntity":{
+        "document":{
+          "identification":"12345678000199",
+          "rel":"CNPJ"
+        }
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":201,
+      "statusConsent":"AWAITING_AUTHORISATION",
+      "permissions":[
+        "RESOURCES_READ",
+        "CUSTOMERS_BUSINESS_IDENTIFICATIONS_READ"
+      ]
+    }
+  },
+  {
+    "categoria":"FASE 2 - Erro",
+    "descricao":"Apenas RESOURCES_READ",
+    "entrada":{
+      "permissions":[
+        "RESOURCES_READ"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"12345678900",
+          "rel":"CPF"
+        }
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":400,
+      "erro":"RESOURCES_READ não pode ser enviada sozinha"
+    }
+  },
+  {
+    "categoria":"FASE 2 - Erro",
+    "descricao":"Permissão PJ sem businessEntity",
+    "entrada":{
+      "permissions":[
+        "RESOURCES_READ",
+        "CUSTOMERS_BUSINESS_IDENTIFICATIONS_READ"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"12345678000199",
+          "rel":"CNPJ"
+        }
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":422,
+      "erro":"Permissão de PJ exige businessEntity"
+    }
+  },
+  {
+    "categoria":"FASE 2 - Erro",
+    "descricao":"Permissão PF com businessEntity",
+    "entrada":{
+      "permissions":[
+        "RESOURCES_READ",
+        "CUSTOMERS_PERSONAL_IDENTIFICATIONS_READ"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"12345678900",
+          "rel":"CPF"
+        }
+      },
+      "businessEntity":{
+        "document":{
+          "identification":"12345678000199",
+          "rel":"CNPJ"
+        }
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":422,
+      "erro":"PF não pode usar businessEntity"
+    }
+  },
+  {
+    "categoria":"FASE 2 - Erro",
+    "descricao":"Mistura Fase 2 + Fase 3",
+    "entrada":{
+      "permissions":[
+        "RESOURCES_READ",
+        "CUSTOMERS_PERSONAL_IDENTIFICATIONS_READ",
+        "ENDORSEMENT_REQUEST_CREATE"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"12345678900",
+          "rel":"CPF"
+        }
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":422,
+      "erro":"Não é permitido misturar permissões de Fase 2 com Fase 3"
+    }
+  },
+  {
+    "categoria":"FASE 2 - Sucesso",
+    "descricao":"Permissões múltiplas da mesma categoria (PERSONAL)",
+    "entrada":{
+      "permissions":[
+        "RESOURCES_READ",
+        "CUSTOMERS_PERSONAL_IDENTIFICATIONS_READ",
+        "CUSTOMERS_PERSONAL_ADDITIONALINFO_READ"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"12345678900",
+          "rel":"CPF"
+        }
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":201,
+      "statusConsent":"AWAITING_AUTHORISATION",
+      "permissions":[
+        "RESOURCES_READ",
+        "CUSTOMERS_PERSONAL_IDENTIFICATIONS_READ",
+        "CUSTOMERS_PERSONAL_ADDITIONALINFO_READ"
+      ]
+    }
+  },
+  {
+    "categoria":"FASE 2 - Sucesso",
+    "descricao":"Permissões parcialmente suportadas → subconjunto aceito",
+    "entrada":{
+      "permissions":[
+        "RESOURCES_READ",
+        "INVALID_PERMISSION",
+        "CUSTOMERS_PERSONAL_IDENTIFICATIONS_READ"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"12345678900",
+          "rel":"CPF"
+        }
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":201,
+      "statusConsent":"AWAITING_AUTHORISATION",
+      "permissions":[
+        "RESOURCES_READ",
+        "CUSTOMERS_PERSONAL_IDENTIFICATIONS_READ"
+      ]
+    }
+  },
+  {
+    "categoria":"FASE 2 - Erro",
+    "descricao":"Pessoa jurídica com rel = CPF",
+    "entrada":{
+      "permissions":[
+        "RESOURCES_READ",
+        "CUSTOMERS_BUSINESS_IDENTIFICATIONS_READ"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"00000000000100",
+          "rel":"CPF"
+        }
+      },
+      "businessEntity":{
+        "document":{
+          "identification":"00000000000100",
+          "rel":"CNPJ"
+        }
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":422,
+      "erro":"Pessoa física não pode usar permissões de pessoa jurídica (BUSINESS)"
+    }
+  },
+  {
+    "categoria":"FASE 2 - Erro",
+    "descricao":"Permissão de PJ sem RESOURCES_READ",
+    "entrada":{
+      "permissions":[
+        "CUSTOMERS_BUSINESS_IDENTIFICATIONS_READ"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"00000000000100",
+          "rel":"CNPJ"
+        }
+      },
+      "businessEntity":{
+        "document":{
+          "identification":"00000000000100",
+          "rel":"CNPJ"
+        }
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":400,
+      "erro":"Permissão RESOURCES_READ obrigatória"
+    }
+  },
+  {
+    "categoria":"FASE 2 - Erro",
+    "descricao":"loggedUser ausente",
+    "entrada":{
+      "permissions":[
+        "RESOURCES_READ",
+        "CUSTOMERS_PERSONAL_IDENTIFICATIONS_READ"
+      ],
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":400,
+      "erro":"Campo loggedUser é obrigatório"
+    }
+  },
+  {
+    "categoria":"FASE 2 - Erro",
+    "descricao":"expirationDateTime mal formatado",
+    "entrada":{
+      "permissions":[
+        "RESOURCES_READ",
+        "CUSTOMERS_PERSONAL_IDENTIFICATIONS_READ"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"12345678900",
+          "rel":"CPF"
+        }
+      },
+      "expirationDateTime":"01-06-2025"
+    },
+    "saida":{
+      "status":400,
+      "erro":"Formato de data inválido (RFC3339 esperado)"
+    }
+  },
+  {
+    "categoria":"FASE 3 - Sucesso",
+    "descricao":"Agrupamento completo (ENDORSEMENT_REQUEST_CREATE + endorsementInformation)",
+    "entrada":{
+      "permissions":[
+        "ENDORSEMENT_REQUEST_CREATE"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"12345678900",
+          "rel":"CPF"
+        }
+      },
+      "endorsementInformation":{
+        "policyNumber":"POL123"
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":201,
+      "statusConsent":"AWAITING_AUTHORISATION",
+      "permissions":[
+        "ENDORSEMENT_REQUEST_CREATE"
+      ]
+    }
+  },
+  {
+    "categoria":"FASE 3 - Sucesso",
+    "descricao":"Permissões parcialmente suportadas → subset funcional aceito",
+    "entrada":{
+      "permissions":[
+        "QUOTE_AUTO_CREATE",
+        "INVALID_PERMISSION"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"12345678900",
+          "rel":"CPF"
+        }
+      },
+      "quoteAutoInformation":{
+        "vehicleId":"123"
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":201,
+      "permissions":[
+        "QUOTE_AUTO_CREATE"
+      ]
+    }
+  },
+  {
+    "categoria":"FASE 3 - Sucesso",
+    "descricao":"Consentimento de resgate com objeto obrigatório (withdrawalLifePensionInformation)",
+    "entrada":{
+      "permissions":[
+        "PERSON_WITHDRAWAL_CREATE"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"12345678900",
+          "rel":"CPF"
+        }
+      },
+      "withdrawalLifePensionInformation":{
+        "type":"2_PARCIAL",
+        "desiredTotalAmount":1000
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":201,
+      "permissions":[
+        "PERSON_WITHDRAWAL_CREATE"
+      ]
+    }
+  },
+  {
+    "categoria":"FASE 3 - Erro",
+    "descricao":"Agrupamentos múltiplos de Fase 3",
+    "entrada":{
+      "permissions":[
+        "ENDORSEMENT_REQUEST_CREATE",
+        "QUOTE_AUTO_CREATE"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"12345678900",
+          "rel":"CPF"
+        }
+      },
+      "endorsementInformation":{
+        "policyNumber":"POL123"
+      },
+      "quoteAutoInformation":{
+        "vehicleId":"123"
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":422,
+      "erro":"Só é permitido um agrupamento por consentimento Fase 3"
+    }
+  },
+  {
+    "categoria":"FASE 3 - Erro",
+    "descricao":"Permissão Fase 3 sem objeto obrigatório",
+    "entrada":{
+      "permissions":[
+        "ENDORSEMENT_REQUEST_CREATE"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"12345678900",
+          "rel":"CPF"
+        }
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":422,
+      "erro":"Objeto obrigatório endorsementInformation ausente"
+    }
+  },
+  {
+    "categoria":"FASE 3 - Erro",
+    "descricao":"Consentimento Fase 3 para si mesmo (SPOC)",
+    "entrada":{
+      "permissions":[
+        "QUOTE_AUTO_CREATE"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"12345678900",
+          "rel":"CPF"
+        }
+      },
+      "quoteAutoInformation":{
+        "vehicleId":"123",
+        "targetDocument":"12345678900"
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":422,
+      "erro":"Não é permitido solicitar um serviço para si mesmo (SPOC)"
+    }
+  },
+  {
+    "categoria":"FASE 3 - Erro",
+    "descricao":"Permissões de Fase 3 com agrupamento incompleto (ex: só QUOTE_AUTO_LEAD_UPDATE)",
+    "entrada":{
+      "permissions":[
+        "QUOTE_AUTO_LEAD_UPDATE"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"12345678900",
+          "rel":"CPF"
+        }
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":400,
+      "erro":"Agrupamento incompleto: QUOTE precisa de múltiplas permissões"
+    }
+  },
+  {
+    "categoria":"COMUM - Erro",
+    "descricao":"Falta de campo obrigatório (permissions)",
+    "entrada":{
+      "loggedUser":{
+        "document":{
+          "identification":"12345678900",
+          "rel":"CPF"
+        }
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":400,
+      "erro":"Campo obrigatório 'permissions' ausente"
+    }
+  },
+  {
+    "categoria":"COMUM - Erro",
+    "descricao":"Falta de campo obrigatório (expirationDateTime)",
+    "entrada":{
+      "permissions":[
+        "RESOURCES_READ",
+        "CUSTOMERS_PERSONAL_IDENTIFICATIONS_READ"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"12345678900",
+          "rel":"CPF"
+        }
+      }
+    },
+    "saida":{
+      "status":400,
+      "erro":"Campo obrigatório 'expirationDateTime' ausente"
+    }
+  },
+  {
+    "categoria":"COMUM - Erro",
+    "descricao":"Permissões inexistentes",
+    "entrada":{
+      "permissions":[
+        "RESOURCES_READ",
+        "INVALID_PERMISSION"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"12345678900",
+          "rel":"CPF"
+        }
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":201,
+      "permissions":[
+        "RESOURCES_READ"
+      ]
+    }
+  },
+  {
+    "categoria":"COMUM - Erro",
+    "descricao":"businessEntity ausente quando exigido",
+    "entrada":{
+      "permissions":[
+        "RESOURCES_READ",
+        "CUSTOMERS_BUSINESS_IDENTIFICATIONS_READ"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"12345678000199",
+          "rel":"CNPJ"
+        }
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":422,
+      "erro":"Campo 'businessEntity' é obrigatório para permissões BUSINESS"
+    }
+  },
+  {
+    "categoria":"COMUM - Erro",
+    "descricao":"Idempotency com divergência de payload",
+    "entrada":{
+      "permissions":[
+        "RESOURCES_READ",
+        "CUSTOMERS_PERSONAL_IDENTIFICATIONS_READ"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"12345678900",
+          "rel":"CPF"
+        }
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":422,
+      "erro":"Payload divergente do consentimento previamente criado com o mesmo Idempotency-Key"
+    }
+  },
+  {
+    "categoria":"COMUM - Erro",
+    "descricao":"Header x-fapi-interaction-id ausente",
+    "entrada":{
+      "permissions":[
+        "RESOURCES_READ",
+        "CUSTOMERS_PERSONAL_IDENTIFICATIONS_READ"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"12345678900",
+          "rel":"CPF"
+        }
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":400,
+      "erro":"Header obrigatório 'x-fapi-interaction-id' ausente"
+    }
+  },
+  {
+    "categoria":"COMUM - Sucesso",
+    "descricao":"Remoção de permissões duplicadas no POST",
+    "entrada":{
+      "permissions":[
+        "RESOURCES_READ",
+        "CUSTOMERS_PERSONAL_IDENTIFICATIONS_READ",
+        "CUSTOMERS_PERSONAL_IDENTIFICATIONS_READ"
+      ],
+      "loggedUser":{
+        "document":{
+          "identification":"12345678900",
+          "rel":"CPF"
+        }
+      },
+      "expirationDateTime":"2025-06-01T15:00:00Z"
+    },
+    "saida":{
+      "status":201,
+      "permissions":[
+        "RESOURCES_READ",
+        "CUSTOMERS_PERSONAL_IDENTIFICATIONS_READ"
+      ]
+    }
+  },
+  {
+    "categoria":"GET - Sucesso",
+    "descricao":"Consulta de status AWAITING_AUTHORISATION",
+    "entrada":{
+      "consentId":"abc123",
+      "Authorization":"Bearer valid_token"
+    },
+    "saida":{
+      "status":200,
+      "data":{
+        "status":"AWAITING_AUTHORISATION",
+        "permissions":[
+          "RESOURCES_READ",
+          "CUSTOMERS_PERSONAL_IDENTIFICATIONS_READ"
+        ]
+      }
+    }
+  },
+  {
+    "categoria":"GET - Sucesso",
+    "descricao":"Consulta de status REJECTED (expirado)",
+    "entrada":{
+      "consentId":"expired123",
+      "Authorization":"Bearer valid_token"
+    },
+    "saida":{
+      "status":200,
+      "data":{
+        "status":"REJECTED",
+        "rejection":{
+          "rejectedBy":"SYSTEM",
+          "reason":{
+            "code":"CONSENT_EXPIRED"
+          }
+        }
+      }
+    }
+  },
+  {
+    "categoria":"GET - Sucesso",
+    "descricao":"Consulta de status REVOKED",
+    "entrada":{
+      "consentId":"revoked123",
+      "Authorization":"Bearer valid_token"
+    },
+    "saida":{
+      "status":200,
+      "data":{
+        "status":"REVOKED",
+        "rejection":{
+          "rejectedBy":"USER",
+          "reason":{
+            "code":"CONSENT_MAX_DATE_REACHED"
+          }
+        }
+      }
+    }
+  },
+  {
+    "categoria":"GET - Erro",
+    "descricao":"Consentimento inexistente",
+    "entrada":{
+      "consentId":"notfound123",
+      "Authorization":"Bearer valid_token"
+    },
+    "saida":{
+      "status":404,
+      "erro":"Consentimento não encontrado"
+    }
+  },
+  {
+    "categoria":"GET - Erro",
+    "descricao":"Token ausente",
+    "entrada":{
+      "consentId":"abc123"
+    },
+    "saida":{
+      "status":401,
+      "erro":"Token ausente ou inválido"
+    }
+  },
+  {
+    "categoria":"GET - Erro",
+    "descricao":"Campo rejection ausente em status REJECTED",
+    "entrada":{
+      "consentId":"rejected_missing_rejection",
+      "Authorization":"Bearer valid_token"
+    },
+    "saida":{
+      "status":500,
+      "erro":"Consentimento com status REJECTED deve conter campo rejection"
+    }
+  },
+  {
+    "categoria":"DELETE - Sucesso",
+    "descricao":"Consentimento AUTHORISED → status REVOKED",
+    "entrada":{
+      "consentId":"auth123",
+      "Authorization":"Bearer valid_token",
+      "x-fapi-interaction-id":"abc-123"
+    },
+    "saida":{
+      "status":200,
+      "data":{
+        "status":"REVOKED",
+        "rejection":{
+          "rejectedBy":"USER",
+          "reason":{
+            "code":"CUSTOMER_MANUALLY_REVOKED"
+          }
+        }
+      }
+    }
+  },
+  {
+    "categoria":"DELETE - Sucesso",
+    "descricao":"Consentimento AWAITING_AUTHORISATION → status REJECTED",
+    "entrada":{
+      "consentId":"await123",
+      "Authorization":"Bearer valid_token",
+      "x-fapi-interaction-id":"abc-456"
+    },
+    "saida":{
+      "status":200,
+      "data":{
+        "status":"REJECTED",
+        "rejection":{
+          "rejectedBy":"USER",
+          "reason":{
+            "code":"CUSTOMER_MANUALLY_REJECTED"
+          }
+        }
+      }
+    }
+  },
+  {
+    "categoria":"DELETE - Erro",
+    "descricao":"Consentimento já REVOKED",
+    "entrada":{
+      "consentId":"revoked123",
+      "Authorization":"Bearer valid_token",
+      "x-fapi-interaction-id":"abc-789"
+    },
+    "saida":{
+      "status":422,
+      "erro":"Não é permitido revogar consentimento já REVOKED"
+    }
+  },
+  {
+    "categoria":"DELETE - Erro",
+    "descricao":"Consentimento inexistente",
+    "entrada":{
+      "consentId":"notfound456",
+      "Authorization":"Bearer valid_token",
+      "x-fapi-interaction-id":"abc-101"
+    },
+    "saida":{
+      "status":404,
+      "erro":"Consentimento não encontrado"
+    }
+  },
+  {
+    "categoria":"DELETE - Erro",
+    "descricao":"Token inválido ou ausente",
+    "entrada":{
+      "consentId":"any-id",
+      "x-fapi-interaction-id":"abc-999"
+    },
+    "saida":{
+      "status":401,
+      "erro":"Token inválido ou ausente"
+    }
+  },
+  {
+    "categoria":"DELETE - Erro",
+    "descricao":"Header x-fapi-interaction-id ausente",
+    "entrada":{
+      "consentId":"auth123",
+      "Authorization":"Bearer valid_token"
+    },
+    "saida":{
+      "status":400,
+      "erro":"Header obrigatório 'x-fapi-interaction-id' ausente"
+    }
+  }
+]
