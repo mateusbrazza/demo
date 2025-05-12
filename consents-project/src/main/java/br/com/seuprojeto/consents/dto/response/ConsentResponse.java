@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ConsentResponse {
     private ConsentDataResponse data;
-    private LinksResponse links;
-    private MetaResponse meta;
+    private LinksExternalResponseV2 links;
+    private MetaExternalResponseV2 meta;
 }

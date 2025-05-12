@@ -12,5 +12,5 @@ import java.util.List;
 @AllArgsConstructor
 public class ResponseError {
     private List<ErrorDetail> errors;
-    private MetaResponse meta; // Mesmo MetaResponse que te mostrei
+    private MetaExternalResponseV2 meta; // Mesmo MetaResponse que te mostrei
 }
