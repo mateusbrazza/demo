@@ -1,0 +1,5 @@
+boto3
+pydantic
+botocore
+moto==4.1.14
+pytest
