@@ -1,45 +1,21 @@
-def consolidate_payloads(payloads):
-    total_pf = 0
-    total_pj = 0
-    organization_map = {}
 
-    for payload in payloads:
-        total_pf += payload.totalPF
-        total_pj += payload.totalPJ
+import logging
+import boto3
+import json
 
-        for org in payload.organizations:
-            if org.id not in organization_map:
-                organization_map[org.id] = {
-                    "id": org.id,
-                    "name": org.name,
-                    "initiators": {}
-                }
+logger = logging.getLogger(__name__)
+s3 = boto3.client("s3")
 
-            for init in org.initiators:
-                if init.id not in organization_map[org.id]["initiators"]:
-                    organization_map[org.id]["initiators"][init.id] = {
-                        "id": init.id,
-                        "name": init.name,
-                        "authorized": 0,
-                        "revoked": 0
-                    }
+def processar_arquivos(event):
+    bucket = event["bucket"]
+    keys = event.get("files", [])
+    payloads = []
 
-                if init.status == "AUTHORIZED":
-                    organization_map[org.id]["initiators"][init.id]["authorized"] += init.total
-                elif init.status == "REVOKED":
-                    organization_map[org.id]["initiators"][init.id]["revoked"] += init.total
+    for key in keys:
+        obj = s3.get_object(Bucket=bucket, Key=key)
+        content = obj["Body"].read().decode("utf-8")
+        payload = json.loads(content)
+        payloads.append(payload)
 
-    summarized_orgs = []
-    for org in organization_map.values():
-        summarized_orgs.append({
-            "id": org["id"],
-            "name": org["name"],
-            "initiators": list(org["initiators"].values())
-        })
-
-    return {
-        "totalPF": total_pf,
-        "totalPJ": total_pj,
-        "organizationCount": len(summarized_orgs),
-        "organizations": summarized_orgs
-    }
+    logger.info(f"{len(payloads)} arquivos processados.")
+    return {"status": "success", "payloads": payloads}
