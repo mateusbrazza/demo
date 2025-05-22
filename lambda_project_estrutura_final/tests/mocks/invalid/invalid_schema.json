@@ -1,0 +1,6 @@
+{
+    "wrong_field": "wrong_value",
+    "invalid_structure": {
+        "something": "incorrect"
+    }
+}

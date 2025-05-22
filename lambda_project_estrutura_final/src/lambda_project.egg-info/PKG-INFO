@@ -1,0 +1,6 @@
+Metadata-Version: 2.1
+Name: lambda_project
+Version: 0.1
+Requires-Dist: boto3
+Requires-Dist: pydantic
+Requires-Dist: botocore
