@@ -1,0 +1,14 @@
+{
+    "totalPF": 200,
+    "totalPJ": 100,
+    "organizations": [
+        {
+            "id": "org2",
+            "name": "Banco B",
+            "initiators": [
+                {"id": "init3", "name": "App Mobile", "total": 100},
+                {"id": "init5", "name": "App Web", "total": 100}
+            ]
+        }
+    ]
+}

@@ -1,0 +1,8 @@
+setup.py
+src/lambda_project.egg-info/PKG-INFO
+src/lambda_project.egg-info/SOURCES.txt
+src/lambda_project.egg-info/dependency_links.txt
+src/lambda_project.egg-info/requires.txt
+src/lambda_project.egg-info/top_level.txt
+tests/test_lambda_function.py
+tests/test_utils.py
