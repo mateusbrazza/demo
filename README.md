@@ -1,45 +1,37 @@
-def consolidate_payloads(payloads):
-    total_pf = 0
-    total_pj = 0
-    organization_map = {}
-
-    for payload in payloads:
-        total_pf += payload.totalPF
-        total_pj += payload.totalPJ
-
-        for org in payload.organizations:
-            if org.id not in organization_map:
-                organization_map[org.id] = {
-                    "id": org.id,
-                    "name": org.name,
-                    "initiators": {}
-                }
-
-            for init in org.initiators:
-                if init.id not in organization_map[org.id]["initiators"]:
-                    organization_map[org.id]["initiators"][init.id] = {
-                        "id": init.id,
-                        "name": init.name,
-                        "authorized": 0,
-                        "revoked": 0
-                    }
-
-                if init.status == "AUTHORIZED":
-                    organization_map[org.id]["initiators"][init.id]["authorized"] += init.total
-                elif init.status == "REVOKED":
-                    organization_map[org.id]["initiators"][init.id]["revoked"] += init.total
-
-    summarized_orgs = []
-    for org in organization_map.values():
-        summarized_orgs.append({
-            "id": org["id"],
-            "name": org["name"],
-            "initiators": list(org["initiators"].values())
-        })
-
-    return {
-        "totalPF": total_pf,
-        "totalPJ": total_pj,
-        "organizationCount": len(summarized_orgs),
-        "organizations": summarized_orgs
-    }
+Package            Version
+------------------ -----------
+annotated-types    0.7.0
+boto3              1.38.21
+botocore           1.38.21
+certifi            2025.4.26
+cffi               1.17.1
+charset-normalizer 3.4.2
+colorama           0.4.6
+coverage           7.8.1
+cryptography       45.0.2
+freezegun          1.5.1
+idna               3.10
+iniconfig          2.1.0
+Jinja2             3.1.6
+jmespath           1.0.1
+MarkupSafe         3.0.2
+moto               5.1.4
+packaging          25.0
+pip                24.0
+pluggy             1.6.0
+pycparser          2.22
+pydantic           2.11.4
+pydantic_core      2.33.2
+pytest             8.3.5
+pytest-cov         6.1.1
+python-dateutil    2.9.0.post0
+PyYAML             6.0.2
+requests           2.32.3
+responses          0.25.7
+s3transfer         0.12.0
+six                1.17.0
+typing_extensions  4.13.2
+typing-inspection  0.4.1
+urllib3            2.4.0
+Werkzeug           3.1.3
+xmltodict          0.14.2
