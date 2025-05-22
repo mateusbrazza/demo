@@ -1,3 +1,0 @@
-pytest
-pytest-cov
-moto==4.1.14
