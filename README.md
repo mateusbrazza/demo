@@ -1,3 +1,42 @@
+
+
+
+    @InjectMocks
+    private ConsentsOpinV2ServiceImpl service;
+
+    @Mock
+    private ConsentRepository repository;
+
+    @Mock
+    private ConsentExpiredRepository repositoryExpired;
+
+    @Test
+    void delete_DeveExcluirConsentimento_QuandoExiste() {
+        String id = "123";
+        Mockito.when(repository.existsById(id)).thenReturn(true);
+
+        service.delete(id);
+
+        Mockito.verify(repository).deleteById(id);
+    }
+
+    @Test
+    void delete_DeveLancarExcecao_QuandoConsentimentoNaoExiste() {
+        String id = "123";
+        Mockito.when(repository.existsById(id)).thenReturn(false);
+
+        ConsentOpinNotFoundException exception = assertThrows(
+            ConsentOpinNotFoundException.class,
+            () -> service.delete(id)
+        );
+
+        assertEquals("Consentimento não encontrado", exception.getMessage());
+        Mockito.verify(repository, Mockito.never()).deleteById(Mockito.anyString());
+    }
+}
+
+
+
 Package            Version
 ------------------ -----------
 annotated-types    0.7.0
